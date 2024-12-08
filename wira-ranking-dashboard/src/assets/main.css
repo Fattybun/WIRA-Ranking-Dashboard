@@ -1,0 +1,23 @@
+@import './base.css';
+
+/* Custom Tailwind CSS Extensions */
+.green {
+  @apply text-green-700 transition-colors duration-300;
+}
+
+@media (hover: hover) {
+  .green:hover {
+    @apply bg-green-200;
+  }
+}
+
+/* Responsive App Container for Large Screens */
+@screen lg {
+  body {
+    @apply flex items-center;
+  }
+
+  #app {
+    @apply grid grid-cols-2 px-8;
+  }
+}
