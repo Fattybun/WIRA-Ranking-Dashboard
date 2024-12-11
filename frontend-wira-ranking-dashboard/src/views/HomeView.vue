@@ -4,7 +4,7 @@
     <!-- Class Selection -->
     <div class="class-selection">
       <label>Select Class:</label>
-      <select v-model="classId" class="class-select">
+      <select v-model="class_id" class="class-select">
         <option v-for="id in classOptions" :key="id" :value="id">Class {{ id }}</option>
       </select>
     </div>
@@ -57,7 +57,7 @@ export default defineComponent({
     const rankings = ref<Ranking[]>([])
     const loading = ref<boolean>(false)
     const page = ref<number>(1)
-    const classId = ref<number>(1)
+    const class_id = ref<number>(1)
     const searchTerm = ref<string>('')
 
     // Class selection options
@@ -69,16 +69,18 @@ export default defineComponent({
 
       try {
         const params = new URLSearchParams({
-          page: page.value.toString(),
+          offset: page.value.toString(),
           pageSize: '20',
-          classID: classId.value.toString(),
+          class_id: class_id.value.toString(),
           search: searchTerm.value,
+          _t: new Date().getTime().toString(),
         })
 
         const response = await fetch(`/api/rankings?${params.toString()}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
+            'Cache-Control': 'no-store',
           },
         })
 
@@ -87,6 +89,8 @@ export default defineComponent({
         }
 
         const data: Ranking[] = await response.json()
+        console.log(data)
+
         rankings.value = data
       } catch (error) {
         console.error('Ranking fetch error:', error)
@@ -109,8 +113,8 @@ export default defineComponent({
       }
     }
 
-    // Watch for changes in page, classId, or searchTerm
-    watch([page, classId, searchTerm], fetchRankings)
+    // Watch for changes in page, class_id, or searchTerm
+    watch([page, class_id, searchTerm], fetchRankings)
 
     // Fetch data on initial load
     onMounted(fetchRankings)
@@ -119,7 +123,7 @@ export default defineComponent({
       rankings,
       loading,
       page,
-      classId,
+      class_id,
       searchTerm,
       classOptions,
       prevPage,
