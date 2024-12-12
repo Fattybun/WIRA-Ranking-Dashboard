@@ -1,4 +1,4 @@
-# wira-ranking-dashboard
+# WIRA Ranking Dashboard
 
 This template should help get you started developing with Vue 3 in Vite.
 
@@ -16,13 +16,31 @@ See [Vite Configuration Reference](https://vite.dev/config/).
 
 ## Project Setup
 
+### Clone the Repository
+
+```sh
+git clone <repository-url>
+```
+
+### Install Dependencies
+
 ```sh
 pnpm install
 ```
 
 ### Compile and Hot-Reload for Development
 
+#### Backend
+
 ```sh
+cd backend-wira-ranking-dashboard
+pnpm dev
+```
+
+#### Frontend
+
+```sh
+cd frontend-wira-ranking-dashboard
 pnpm dev
 ```
 

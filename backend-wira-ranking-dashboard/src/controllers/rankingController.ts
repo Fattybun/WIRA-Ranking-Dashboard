@@ -7,19 +7,33 @@ export const getRankings = async (req: Request, res: Response) => {
   const offset = (Number(page) - 1) * Number(pageSize);
   try {
     const query = `
-      SELECT 
-        accounts.username, characters.class_id, scores.reward_score AS top_score, 
-        RANK() OVER (PARTITION BY characters.class_id ORDER BY scores.reward_score DESC) AS rank
-      FROM accounts
-      JOIN characters ON accounts.acc_id = characters.acc_id
-      JOIN scores ON characters.char_id = scores.char_id
-      WHERE characters.class_id = $1 
-      AND accounts.username ILIKE $2
-      ORDER BY top_score DESC
-      LIMIT $3 OFFSET $4
+      WITH RankedScores AS (
+        SELECT 
+          accounts.username, 
+          characters.class_id, 
+          scores.reward_score,
+          DENSE_RANK() OVER (PARTITION BY characters.class_id ORDER BY scores.reward_score DESC) AS rank
+        FROM scores
+        JOIN characters ON scores.char_id = characters.char_id
+        JOIN accounts ON characters.acc_id = accounts.acc_id
+        WHERE characters.class_id = $1 
+          AND accounts.username ILIKE $2
+      )
+      SELECT username, class_id, reward_score AS top_score, rank
+      FROM RankedScores
+      WHERE rank <= $3
+      ORDER BY reward_score DESC
+      LIMIT $4 OFFSET $5
     `;
 
-    const values = [class_id ?? 1, `%${search || ""}%`, pageSize, offset];
+    const values = [
+      class_id ?? 1,
+      `%${search || ""}%`,
+      Number(pageSize),
+      Number(pageSize),
+      offset,
+    ];
+
     const result = await pool.query(query, values);
 
     res.json(result.rows);
